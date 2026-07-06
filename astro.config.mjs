@@ -4,7 +4,7 @@ import starlight from '@astrojs/starlight';
 
 export default defineConfig({
 	site: 'https://xeland314.github.io',
-	base: '/catsplash',
+	base: '/catsplash-docs',
 	integrations: [
 		starlight({
 			title: 'Catsplash',
