@@ -1,0 +1,36 @@
+---
+title: Network Troubleshooting
+description: Solutions for the exclamation mark on WiFi and other common captive portal issues.
+---
+
+## The "!" Sign (Limbo State)
+
+It is common that after authenticating on the captive portal, the device shows an exclamation mark (`!`) on the WiFi icon or says "Connected, no internet".
+
+This does not necessarily mean you have no internet; the operating system **has not yet verified** the connection after the state change.
+
+### How the phone checks for internet
+
+Android and iOS phones try to download a small file from servers like `connectivitycheck.gstatic.com` or `captive.apple.com`:
+
+- **Before authentication**: The request is intercepted by Catsplash. The phone sees the network is restricted.
+- **Right after authentication**: The phone may take 5 to 60 seconds to retry the check.
+
+## The Automatic Redirect Problem
+
+Catsplash automatically adds a "Bypass" rule in the NAT table for each authenticated client. This allows HTTP requests to no longer be intercepted once authenticated.
+
+However, the problem may persist briefly due to:
+1. **DNS Cache**: The phone remembers the portal's IP.
+2. **CNA Closure**: The Captive Network Assistant closes before processing the redirect.
+
+## Quick Solutions
+
+1. **Wait 10 seconds**: Give the system time to refresh the rules.
+2. **Browse manually**: Open your browser and go to `http://1.1.1.1` or `http://neverssl.com`.
+3. **Toggle WiFi off and on**: Forces the phone to re-evaluate the network.
+4. **Use the "Finish" button**: The Catsplash success page has a manual button.
+
+## Note about HTTPS
+
+The captive portal can only intercept **HTTP (port 80)** traffic. If you visit an **HTTPS (port 443)** website before authenticating, the browser will show a certificate error. **Always use an HTTP website for the portal to appear.**

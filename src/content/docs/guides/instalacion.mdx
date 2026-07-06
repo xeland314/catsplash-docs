@@ -1,0 +1,68 @@
+---
+title: Instalación
+description: Requisitos, compilación e instalación de Catsplash en Linux.
+---
+
+Catsplash funciona **exclusivamente en Linux**. Requiere acceso root y las herramientas de red del sistema.
+
+## Requisitos del sistema
+
+- Linux con kernel moderno (Debian/Ubuntu recomendado).
+- Acceso root.
+- Dos interfaces de red: una para el hotspot WiFi y otra para salida a Internet.
+- Dependencias: `hostapd`, `dnsmasq`, `iptables`, `gcc`, `make`, `sqlite3`, Go 1.26+.
+
+## Instalación rápida (recomendada)
+
+```bash
+git clone https://github.com/xeland314/catsplash.git
+cd catsplash
+make build
+sudo ./setup.sh
+```
+
+El comando `make build` compila los binarios `catsplash` y `catsctl` en la carpeta `bin/`. Luego `setup.sh` guía la instalación paso a paso.
+
+## Instalación manual
+
+1. Compila los binarios:
+   ```bash
+   make build
+   ```
+
+2. Crea el directorio de instalación y copia los archivos:
+   ```bash
+   sudo mkdir -p /opt/catsplash
+   sudo install -m 0755 bin/catsplash /opt/catsplash/
+   sudo install -m 0755 bin/catsctl /opt/catsplash/
+   sudo ln -sf /opt/catsplash/catsctl /usr/local/bin/catsctl
+   ```
+
+3. Crea el archivo de configuración `/opt/catsplash/config.toml`.
+
+4. Configura hostapd y dnsmasq manualmente, o ejecuta `setup.sh` para hacerlo automáticamente.
+
+## Compilación cruzada para otras arquitecturas
+
+Catsplash soporta compilación cruzada gracias a Go. Usa `make release` para generar binarios estáticos:
+
+| Arquitectura | Comando |
+|---|---|
+| linux/amd64 (v1) | `GOOS=linux GOARCH=amd64 GOAMD64=v1` |
+| linux/amd64 (v2) | `GOOS=linux GOARCH=amd64 GOAMD64=v2` |
+| linux/386 | `GOOS=linux GOARCH=386` |
+| linux/arm64 | `GOOS=linux GOARCH=arm64` |
+| linux/arm/v7 | `GOOS=linux GOARCH=arm GOARM=7` |
+
+```bash
+make release
+```
+
+Esto genera archivos `.tar.gz` en `bin/` con nombres como `catsplash-linux-amd64-v1.tar.gz`.
+
+## Verificación
+
+```bash
+sudo ./bin/catsplash
+# Deberías ver: "Catsplash is running. Press Ctrl+C to stop."
+```

@@ -1,0 +1,103 @@
+---
+title: catsctl CLI
+description: Complete reference for the catsctl command-line tool.
+---
+
+`catsctl` is the command-line interface for managing Catsplash.
+
+## General usage
+
+```bash
+sudo catsctl [options] <command> [arguments]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--config <path>` | Path to the TOML configuration file |
+
+## Commands
+
+### `status`
+
+Shows system statistics: interfaces, port, active/pending sessions, and total traffic.
+
+```bash
+sudo catsctl status
+```
+
+### `list`
+
+Lists all clients in the database with their state, MAC, IP, connection time, data used, limits, and bandwidth.
+
+```bash
+sudo catsctl list
+```
+
+### `auth`
+
+Manually authorizes a client.
+
+```bash
+sudo catsctl auth <mac> <ip>
+```
+
+**Example:**
+```bash
+sudo catsctl auth aa:bb:cc:dd:ee:ff 192.168.10.50
+```
+
+### `kick`
+
+Manually disconnects a client.
+
+```bash
+sudo catsctl kick <mac>
+```
+
+**Example:**
+```bash
+sudo catsctl kick aa:bb:cc:dd:ee:ff
+```
+
+### `extend`
+
+Extends a client's session by N minutes.
+
+```bash
+sudo catsctl extend <mac> <minutes>
+```
+
+**Example:**
+```bash
+sudo catsctl extend aa:bb:cc:dd:ee:ff 30
+```
+
+### `limit`
+
+Sets a data limit for a client in MB. Use `0` to remove the limit.
+
+```bash
+sudo catsctl limit <mac> <mb>
+```
+
+**Example:**
+```bash
+sudo catsctl limit aa:bb:cc:dd:ee:ff 500
+```
+
+### `band`
+
+Sets bandwidth limits for a client.
+
+```bash
+sudo catsctl band <mac> <download> <upload>
+```
+
+Values can be in `mbit`, `kbit`, etc. Use `0` to disable.
+
+**Example:**
+```bash
+sudo catsctl band aa:bb:cc:dd:ee:ff 5mbit 2mbit
+```

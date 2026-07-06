@@ -1,0 +1,76 @@
+---
+title: Configuracion de Red Avanzada
+description: Configuracion manual de hostapd, dnsmasq e interfaces de red para Catsplash.
+---
+
+Para que el portal cautivo funcione correctamente, el sistema operativo debe actuar como un punto de acceso (Access Point) y proporcionar servicios basicos de red (DHCP y DNS).
+
+## 1. Instalacion de Requisitos
+
+```bash
+sudo apt update
+sudo apt install hostapd dnsmasq
+```
+
+## 2. Configuracion de la Interfaz de Red
+
+Asigna una IP estatica a la interfaz WiFi del hotspot:
+
+```bash
+sudo ip addr add 192.168.10.1/24 dev wlx1cbfce41183a
+sudo ip link set wlx1cbfce41183a up
+```
+
+## 3. Configuracion de hostapd (Punto de Acceso)
+
+Crea o edita `/etc/hostapd/hostapd.conf`:
+
+```conf
+interface=wlx1cbfce41183a
+driver=nl80211
+ssid=Mi_Red_WiFi
+hw_mode=g
+channel=6
+auth_algs=1
+wmm_enabled=0
+macaddr_acl=0
+ignore_broadcast_ssid=0
+```
+
+Para activarlo, edita `/etc/default/hostapd`:
+```
+DAEMON_CONF="/etc/hostapd/hostapd.conf"
+```
+
+## 4. Configuracion de dnsmasq (DHCP y DNS)
+
+Edita `/etc/dnsmasq.conf`:
+
+```conf
+interface=wlx1cbfce41183a
+bind-interfaces
+dhcp-range=192.168.10.10,192.168.10.100,255.255.255.0,12h
+dhcp-option=3,192.168.10.1
+dhcp-option=6,192.168.10.1,8.8.8.8
+server=8.8.8.8
+```
+
+## 5. Activacion de Servicios
+
+```bash
+sudo systemctl unmask hostapd
+sudo systemctl enable hostapd
+sudo systemctl restart hostapd
+
+sudo systemctl enable dnsmasq
+sudo systemctl restart dnsmasq
+```
+
+## 6. Solucion de Problemas Comunes
+
+- **Interfaz "Busy"**: Configura NetworkManager para no gestionar la interfaz WiFi anadiendola a `/etc/NetworkManager/conf.d/99-catsplash.conf`:
+  ```
+  [keyfile]
+  unmanaged-devices=interface-name:wlx1cbfce41183a
+  ```
+- **DNS no responde**: Verifica que el puerto 53 no este bloqueado por `systemd-resolved` u otro servicio.

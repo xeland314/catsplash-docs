@@ -1,0 +1,72 @@
+---
+title: Performance
+description: Stress tests, resource usage, and stability under load.
+---
+
+Catsplash is designed to operate with minimal resources on legacy hardware or embedded routers.
+
+## Test hardware
+
+| Component | Detail |
+|---|---|
+| CPU | Intel Core 2 Duo E7400 @ 2.79 GHz (2 cores) |
+| RAM | 3.58 GiB |
+| Disk | ext4, 100 GiB |
+| OS | Debian GNU/Linux 13 (trixie), kernel 6.12 |
+
+## Concurrency test: 100 simultaneous clients
+
+### Resource usage
+
+| State | % CPU | Real RAM (RSS) | Virtual RAM (VIRT) |
+|---|---|---|---|
+| Initial idle | 0.0% | ~8.7 MB | ~1.7 GB |
+| Peak load | 13.6% | ~24.8 MB | ~3.1 GB |
+| Post-cleanup | 0.0% | ~14.7 MB | ~2.4 GB |
+
+### Response times
+
+| Metric | Burst #1 | Burst #2 |
+|---|---|---|
+| Successful requests | 100/100 | 100/100 |
+| Minimum time | 0.19 s | 0.42 s |
+| p50 | 1.34 s | 4.70 s |
+| p95 | 1.94 s | 5.32 s |
+| p99/maximum | 2.34 s | 5.72 s |
+
+## Soak test (60 minutes)
+
+| Metric | Idle | Peak (100 clients) | Post-cleanup |
+|---|---|---|---|
+| RAM RSS | 8.7 MB | 24.8 MB | 14.7 MB |
+| NAT rules | 9 | 108 | 9 |
+| Filter rules | 10 | 208 | 10 |
+| DB size | 12 KB | 12 KB | 12 KB |
+| HTTP errors | 0% | 0% | 0% |
+
+## Key results
+
+- **No memory leaks**: RSS stabilizes at ~14.7 MB after cleanup.
+- **0% orphaned rules**: All iptables rules are cleaned on session expiration.
+- **Stable database**: SQLite in WAL mode maintains 12 KB with no growth.
+- **100% HTTP success**: All concurrent requests return HTTP 200.
+- **Deterministic formula**: `NAT rules = 8 + active clients`, `Filter rules = 8 + (2 × active clients)`.
+
+## Running your own tests
+
+```bash
+# 1. Create topology with 50 simulated clients
+sudo ./tests/test_catsplash_multiclient.sh up -n 50
+
+# 2. In another terminal, start Catsplash
+sudo ip netns exec ns_router ./bin/catsplash
+
+# 3. Run authentications
+sudo ./tests/test_catsplash_multiclient.sh run
+
+# 4. Clean up
+sudo ./tests/test_catsplash_multiclient.sh down
+
+# Or long-duration soak test
+sudo ./tests/soak_test.sh -n 10 --hours 1
+```

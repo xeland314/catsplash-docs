@@ -1,0 +1,59 @@
+---
+title: Configuración
+description: Configuración de red, firewall, WiFi y servicios del sistema.
+---
+
+## Asistente de configuración (setup.sh)
+
+El script `setup.sh` es la forma más sencilla de configurar Catsplash. Ofrece un menú interactivo con las siguientes opciones:
+
+1. **Configurar e Instalar** (Wizard): Guía paso a paso para instalar dependencias, seleccionar interfaces, configurar WiFi y crear servicios systemd.
+2. **Iniciar/Detener/Reiniciar Servicios**: Control de hostapd, dnsmasq y Catsplash.
+3. **Ver Estado**: Muestra servicios activos y sesiones en la base de datos.
+4. **Ver Logs**: Últimas líneas del log de Catsplash.
+5. **Desinstalar**: Restaura configuraciones originales y elimina archivos.
+
+```bash
+sudo ./setup.sh
+```
+
+También acepta comandos directos:
+```bash
+sudo ./setup.sh start
+sudo ./setup.sh stop
+sudo ./setup.sh status
+sudo ./setup.sh logs
+sudo ./setup.sh uninstall
+```
+
+## Archivo de configuración TOML
+
+El archivo de configuración (`/opt/catsplash/config.toml`) se genera automáticamente con el wizard.
+
+## Interfaces de red
+
+Catsplash requiere dos interfaces:
+- **AP (Access Point)**: Interfaz WiFi que emite la red del hotspot.
+- **WAN**: Interfaz con salida a Internet (eth0, enp1s0, etc.).
+
+## Servicios systemd
+
+El wizard crea cuatro servicios systemd:
+
+- `catsplash-ip.service`: Asigna la IP estática al hotspot.
+- `hostapd.service`: Punto de acceso WiFi.
+- `dnsmasq.service`: DHCP y DNS para clientes.
+- `catsplash.service`: El portal cautivo en sí.
+
+```bash
+sudo systemctl status catsplash
+sudo journalctl -u catsplash -f
+```
+
+## Configuración de red avanzada
+
+Para configuraciones manuales de hostapd y dnsmasq, consulta:
+
+- [Configuración de Red Avanzada](/guides/red/)
+- [Seguridad WiFi WPA2](/guides/seguridad-wifi/)
+- [Solución de problemas de red](/guides/problemas-red/)

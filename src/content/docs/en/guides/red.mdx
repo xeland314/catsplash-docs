@@ -1,0 +1,76 @@
+---
+title: Advanced Network Setup
+description: Manual configuration of hostapd, dnsmasq and network interfaces for Catsplash.
+---
+
+For the captive portal to work correctly, the operating system must act as an access point and provide basic network services (DHCP and DNS).
+
+## 1. Install Requirements
+
+```bash
+sudo apt update
+sudo apt install hostapd dnsmasq
+```
+
+## 2. Network Interface Configuration
+
+Assign a static IP to the WiFi hotspot interface:
+
+```bash
+sudo ip addr add 192.168.10.1/24 dev wlx1cbfce41183a
+sudo ip link set wlx1cbfce41183a up
+```
+
+## 3. hostapd Configuration (Access Point)
+
+Create or edit `/etc/hostapd/hostapd.conf`:
+
+```conf
+interface=wlx1cbfce41183a
+driver=nl80211
+ssid=My_WiFi_Network
+hw_mode=g
+channel=6
+auth_algs=1
+wmm_enabled=0
+macaddr_acl=0
+ignore_broadcast_ssid=0
+```
+
+To enable it, edit `/etc/default/hostapd`:
+```
+DAEMON_CONF="/etc/hostapd/hostapd.conf"
+```
+
+## 4. dnsmasq Configuration (DHCP and DNS)
+
+Edit `/etc/dnsmasq.conf`:
+
+```conf
+interface=wlx1cbfce41183a
+bind-interfaces
+dhcp-range=192.168.10.10,192.168.10.100,255.255.255.0,12h
+dhcp-option=3,192.168.10.1
+dhcp-option=6,192.168.10.1,8.8.8.8
+server=8.8.8.8
+```
+
+## 5. Start Services
+
+```bash
+sudo systemctl unmask hostapd
+sudo systemctl enable hostapd
+sudo systemctl restart hostapd
+
+sudo systemctl enable dnsmasq
+sudo systemctl restart dnsmasq
+```
+
+## 6. Common Troubleshooting
+
+- **Interface "Busy"**: Configure NetworkManager to ignore the WiFi interface by adding to `/etc/NetworkManager/conf.d/99-catsplash.conf`:
+  ```
+  [keyfile]
+  unmanaged-devices=interface-name:wlx1cbfce41183a
+  ```
+- **DNS not responding**: Check that port 53 is not blocked by `systemd-resolved` or another service.

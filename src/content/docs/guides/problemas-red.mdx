@@ -1,0 +1,36 @@
+---
+title: Problemas de Conectividad
+description: Solucion al signo de admiracion en el WiFi y otros problemas comunes del portal cautivo.
+---
+
+## El Signo "!" (Estado de Limbo)
+
+Es comun que tras autenticarse en el portal cautivo, el dispositivo muestre un signo de admiracion (`!`) en el icono de WiFi o indique "Conectado sin internet".
+
+Esto no significa que no tengas internet, sino que el sistema operativo **aun no ha verificado** la conexion tras el cambio de estado.
+
+### Como verifica el movil si hay internet
+
+Los moviles Android e iOS intentan descargar un archivo pequeno de servidores como `connectivitycheck.gstatic.com` o `captive.apple.com`:
+
+- **Antes de autenticar**: La peticion es interceptada por Catsplash. El movil ve que la red esta restringida.
+- **Justo despues de autenticar**: El movil puede tardar de 5 a 60 segundos en volver a intentar la comprobacion.
+
+## El Problema de la Redireccion Automatica
+
+Catsplash anade automaticamente una regla de "Bypass" en la tabla NAT para cada cliente autenticado. Esto permite que las peticiones HTTP ya no sean interceptadas una vez autenticado.
+
+Sin embargo, el problema puede persistir brevemente por:
+1. **Cache DNS**: El movil recuerda que la IP del portal era la de Google.
+2. **Cierre del CNA**: El Asistente de Red se cierra antes de procesar la redireccion.
+
+## Soluciones Rapidas
+
+1. **Espera 10 segundos**: Dale tiempo al sistema para refrescar las reglas.
+2. **Navega manualmente**: Abre tu navegador y entra a `http://1.1.1.1` o `http://neverssl.com`.
+3. **Apaga y enciende el WiFi**: Obliga al movil a reevaluar la red desde cero.
+4. **Usa el boton "Finalizar"**: En la pagina de exito de Catsplash hay un boton manual.
+
+## Nota sobre HTTPS
+
+El portal cautivo solo puede interceptar trafico **HTTP (puerto 80)**. Si entras a una web **HTTPS (puerto 443)** antes de autenticarte, el navegador mostrara un error de certificado. **Siempre usa una web HTTP para que el portal aparezca.**

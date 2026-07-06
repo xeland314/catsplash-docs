@@ -1,40 +1,39 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
-template: splash # Remove or comment out this line to display the site sidebar on this page.
+title: Catsplash
+description: Portal cautivo ligero para Linux. Gestiona el acceso a Internet en redes WiFi temporales con Go, SQLite e iptables.
+template: splash
 hero:
-  tagline: Congrats on setting up a new Starlight project!
-  image:
-    file: ../../assets/houston.webp
+  tagline: Portal cautivo ligero para Linux. Bloquea, autentica y libera tráfico WiFi con Go, SQLite e iptables.
   actions:
-    - text: Example Guide
-      link: /guides/example/
+    - text: Empezar
+      link: /guides/introduccion/
       icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
+    - text: Ver en GitHub
+      link: https://github.com/xeland314/catsplash
       icon: external
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+Catsplash es un **portal cautivo** minimalista y eficiente para Linux. Permite abrir una red WiFi temporal, bloquear el acceso a Internet hasta que el usuario acepta los términos, y liberar el tráfico de forma segura.
 
-## Next steps
+## Características principales
 
-<CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Change page layout" icon="document">
-		Delete `template: splash` in `src/content/docs/index.mdx` to display a
-		sidebar on this page.
-	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
-	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
-</CardGrid>
+-   **Portal cautivo compatible** con Captive Network Assistant de Android e iOS.
+-   **Gestión de sesiones** con SQLite en modo WAL, expiración por tiempo absoluto e inactividad.
+-   **Firewall determinista** con iptables: 1 regla NAT + 2 reglas Filter por cliente activo.
+-   **CLI de control** `catsctl` para monitorear y administrar sesiones desde la terminal.
+-   **Instalador guiado** `setup.sh` que prepara hostapd, dnsmasq, iptables y servicios systemd.
+-   **Bajo consumo de recursos**: menos de 25 MB de RAM bajo carga máxima de 100 clientes concurrentes.
+-   **Compilación cruzada** para Linux en múltiples arquitecturas (amd64, 386, arm64, armv7).
+-   **Suite de pruebas aisladas** usando network namespaces para simular hasta 100+ clientes WiFi.
+
+## Primeros pasos
+
+```bash
+git clone https://github.com/xeland314/catsplash.git
+cd catsplash
+make build
+sudo ./setup.sh
+```
+
+> **Nota:** Catsplash funciona **solamente en Linux**. Los binarios compilados requieren iptables y acceso root.

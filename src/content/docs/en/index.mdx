@@ -1,0 +1,39 @@
+---
+title: Catsplash
+description: Lightweight captive portal for Linux. Manage Internet access on temporary WiFi networks with Go, SQLite and iptables.
+template: splash
+hero:
+  tagline: Lightweight captive portal for Linux. Block, authenticate and release WiFi traffic with Go, SQLite and iptables.
+  actions:
+    - text: Get Started
+      link: /en/guides/introduccion/
+      icon: right-arrow
+    - text: View on GitHub
+      link: https://github.com/xeland314/catsplash
+      icon: external
+      variant: minimal
+---
+
+Catsplash is a **minimalist captive portal** for Linux. It creates a temporary WiFi network, blocks Internet access until the user accepts the terms, and securely releases traffic.
+
+## Key Features
+
+-   **Captive portal compatible** with Android and iOS Captive Network Assistant.
+-   **Session management** with SQLite in WAL mode, expiration by absolute time and inactivity.
+-   **Deterministic firewall** with iptables: 1 NAT rule + 2 Filter rules per active client.
+-   **catsctl CLI** to monitor and manage sessions from the terminal.
+-   **Guided installer** `setup.sh` that prepares hostapd, dnsmasq, iptables and systemd services.
+-   **Low resource usage**: under 25 MB RAM under maximum load of 100 concurrent clients.
+-   **Cross-compilation** for Linux on multiple architectures (amd64, 386, arm64, armv7).
+-   **Isolated test suite** using network namespaces to simulate up to 100+ WiFi clients.
+
+## Quick Start
+
+```bash
+git clone https://github.com/xeland314/catsplash.git
+cd catsplash
+make build
+sudo ./setup.sh
+```
+
+> **Note:** Catsplash works **on Linux only**. Compiled binaries require iptables and root access.

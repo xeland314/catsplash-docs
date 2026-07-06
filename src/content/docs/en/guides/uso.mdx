@@ -1,0 +1,90 @@
+---
+title: Usage
+description: How to start Catsplash, manage sessions, and monitor clients.
+---
+
+## Starting Catsplash
+
+Once installed, start the captive portal:
+
+```bash
+sudo ./bin/catsplash
+```
+
+Or if installed as a systemd service:
+
+```bash
+sudo systemctl start catsplash
+```
+
+It listens on port `8080` by default. Clients connecting to the WiFi will be automatically redirected to the portal.
+
+## catsctl: Control CLI
+
+`catsctl` is the command-line tool for managing Catsplash.
+
+### Show system status
+
+```bash
+sudo catsctl status
+```
+
+Displays active interfaces, portal port, active/pending sessions, and total traffic.
+
+### List clients
+
+```bash
+sudo catsctl list
+```
+
+Table with state, MAC, IP, connection time, data used, limits, and bandwidth for each client.
+
+### Manual authorization
+
+```bash
+sudo catsctl auth aa:bb:cc:dd:ee:ff 192.168.10.50
+```
+
+### Disconnect a client
+
+```bash
+sudo catsctl kick aa:bb:cc:dd:ee:ff
+```
+
+### Extend a session
+
+```bash
+sudo catsctl extend aa:bb:cc:dd:ee:ff 30
+```
+
+Extends the session by 30 minutes.
+
+### Set data limit
+
+```bash
+sudo catsctl limit aa:bb:cc:dd:ee:ff 500
+```
+
+500 MB limit. Use `0` to remove the limit.
+
+### Set bandwidth
+
+```bash
+sudo catsctl band aa:bb:cc:dd:ee:ff 5mbit 2mbit
+```
+
+Download limit 5 Mbps, upload 2 Mbps. Use `0` to disable.
+
+## Web admin panel
+
+Catsplash includes a basic admin panel at:
+
+```
+http://<gateway_ip>:8080/admin
+```
+
+Default credentials: `admin` / `catsplash`.
+
+## Traffic monitoring
+
+Catsplash monitors traffic for each authenticated client every 10 seconds using iptables counters. If a client exceeds their data quota, the session is automatically closed.

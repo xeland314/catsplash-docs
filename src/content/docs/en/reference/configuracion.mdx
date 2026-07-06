@@ -1,0 +1,90 @@
+---
+title: TOML Configuration
+description: Complete reference for the TOML configuration file.
+---
+
+Catsplash is configured via a TOML file. It looks for `config.toml` in the current directory or `/opt/catsplash/config.toml`.
+
+## Complete example
+
+```toml
+iface = "wlx1cbfce41183a"
+wan_iface = "eth0"
+portal_port = 8080
+session_timeout = 3600
+idle_timeout = 900
+db_path = "/opt/catsplash/catsplash.db"
+redirect_url = "http://192.168.10.1:8080/portal"
+download_speed = "0"
+upload_speed = "0"
+admin_user = "admin"
+admin_pass = "catsplash"
+```
+
+## Fields
+
+### `iface`
+Network interface for the WiFi hotspot.
+
+- **Type:** `string`
+- **Default:** `"wlan0"`
+
+### `wan_iface`
+Network interface with Internet access.
+
+- **Type:** `string`
+- **Default:** `"eth0"`
+
+### `portal_port`
+Port where the portal web server listens.
+
+- **Type:** `int`
+- **Default:** `8080`
+
+### `session_timeout`
+Maximum absolute session time in seconds.
+
+- **Type:** `int`
+- **Default:** `3600` (1 hour)
+
+### `idle_timeout`
+Maximum idle time in seconds before closing the session.
+
+- **Type:** `int`
+- **Default:** `600` (10 minutes)
+
+### `db_path`
+Path to the SQLite database file.
+
+- **Type:** `string`
+- **Default:** `"captive.db"`
+
+### `redirect_url`
+URL clients are redirected to for the captive portal.
+
+- **Type:** `string`
+- **Default:** `"http://192.168.1.1:8080/portal"`
+
+### `download_speed`
+Global download speed limit. `"0"` for unlimited.
+
+- **Type:** `string`
+- **Default:** `"0"`
+
+### `upload_speed`
+Global upload speed limit. `"0"` for unlimited.
+
+- **Type:** `string`
+- **Default:** `"0"`
+
+### `admin_user`
+Username for the web admin panel.
+
+- **Type:** `string`
+- **Default:** `"admin"`
+
+### `admin_pass`
+Password for the web admin panel.
+
+- **Type:** `string`
+- **Default:** `"catsplash"`

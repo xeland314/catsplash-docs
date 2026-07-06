@@ -1,0 +1,88 @@
+---
+title: Architecture
+description: Internal components, authentication flow, and system design.
+---
+
+## Component diagram
+
+```
+Wi-Fi Client ──> Access Point (hostapd) ──> Catsplash
+                         │                       │
+                         │                  ┌────┴────┐
+                         │                  │ Firewall│
+                         │                  │(iptables)│
+                         │                  └─────────┘
+                         │                       │
+                         │                  ┌────┴────┐
+                         │                  │  SQLite  │
+                         │                  │  (WAL)   │
+                         │                  └─────────┘
+                         │                       │
+                         │                  ┌────┴────┐
+                         │                  │   Web    │
+                         │                  │  Portal  │
+                         │                  └─────────┘
+```
+
+## Main components
+
+### `main.go` (Entry point)
+
+1. Loads configuration (TOML + CLI flags).
+2. Opens SQLite database with WAL.
+3. Initializes firewall (iptables).
+4. Sets up DNAT redirection.
+5. Starts the Reaper (session expiration manager).
+6. Starts the traffic monitor.
+7. Launches the portal web server.
+8. Waits for termination signal to clean up resources.
+
+### `config/` (Configuration)
+
+Loads and validates configuration from a TOML file. Supports CLI flag overrides (`--iface`, `--wan`, `--port`, `--db`).
+
+### `firewall/` (Firewall)
+
+iptables management module:
+- **Init()**: Creates custom `CATS_PREROUTING` chain, NAT Masquerade, FORWARD rules.
+- **SetupRedirect()**: Adds DNAT rule to redirect HTTP traffic to the portal.
+- **AllowClient()**: Inserts 2 FORWARD rules (upload/download) + 1 NAT rule (bypass).
+- **BlockClient()**: Removes the above rules.
+- **Teardown()**: Complete cleanup on exit.
+
+### `state/` (State)
+
+SQLite session management:
+- **DB**: Opens SQLite connection with WAL, automatic migrations.
+- **Reaper**: Goroutine that checks every 10 seconds for expired sessions and closes them.
+- **Client**: Struct with MAC, IP, state, timestamps, traffic, and limits.
+
+### `server/` (Web server)
+
+Serves the captive portal:
+- `/portal` - Welcome page with authentication form.
+- `/auth` - Processes authentication and releases the client.
+- `/admin` - Admin panel with basic auth.
+- `/` (catch-all) - Intercepts any HTTP request and redirects to the portal.
+
+### `catsctl/` (CLI)
+
+Terminal administration tool with commands: `status`, `list`, `auth`, `kick`, `extend`, `limit`, `band`.
+
+## Authentication flow
+
+1. Client connects to WiFi and gets an IP via DHCP.
+2. Client tries to browse (e.g. `http://example.com`).
+3. iptables redirects port 80 to the Catsplash portal (DNAT).
+4. Catsplash shows the welcome portal.
+5. User accepts terms → POST to `/auth`.
+6. Catsplash inserts firewall rules to release the client.
+7. Client has Internet access until their session expires.
+8. On expiration, the Reaper blocks the client and cleans up rules.
+
+## Testing with network namespaces
+
+The test suite creates isolated namespaces:
+- `ns_router`: Runs Catsplash.
+- `ns_wan`: Simulates public Internet.
+- `ns_client [1..100]`: Simulated clients with unique IP and MAC addresses.

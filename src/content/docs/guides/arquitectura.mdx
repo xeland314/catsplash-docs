@@ -1,0 +1,88 @@
+---
+title: Arquitectura
+description: Componentes internos, flujo de autenticación y diseño del sistema.
+---
+
+## Diagrama de componentes
+
+```
+Cliente Wi-Fi ──> Punto de Acceso (hostapd) ──> Catsplash
+                           │                         │
+                           │                    ┌────┴────┐
+                           │                    │ Firewall│
+                           │                    │(iptables)│
+                           │                    └─────────┘
+                           │                         │
+                           │                    ┌────┴────┐
+                           │                    │   SQLite │
+                           │                    │  (WAL)   │
+                           │                    └─────────┘
+                           │                         │
+                           │                    ┌────┴────┐
+                           │                    │  Portal  │
+                           │                    │  Web     │
+                           │                    └─────────┘
+```
+
+## Componentes principales
+
+### `main.go` (Punto de entrada)
+
+1. Carga configuración (TOML + flags de CLI).
+2. Abre base de datos SQLite con WAL.
+3. Inicializa firewall (iptables).
+4. Configura redirección DNAT.
+5. Inicia el Reaper (gestor de expiración de sesiones).
+6. Inicia el monitor de tráfico.
+7. Arranca el servidor web del portal.
+8. Espera señal de terminación para limpiar recursos.
+
+### `config/` (Configuración)
+
+Carga y valida la configuración desde un archivo TOML. Soporta sobrescritura mediante flags de CLI (`--iface`, `--wan`, `--port`, `--db`).
+
+### `firewall/` (Firewall)
+
+Módulo que gestiona iptables:
+- **Init()**: Crea cadena personalizada `CATS_PREROUTING`, NAT Masquerade, reglas FORWARD.
+- **SetupRedirect()**: Añade regla DNAT para redirigir tráfico HTTP al portal.
+- **AllowClient()**: Inserta 2 reglas FORWARD (subida/bajada) + 1 regla NAT (bypass).
+- **BlockClient()**: Elimina las reglas anteriores.
+- **Teardown()**: Limpieza completa al salir.
+
+### `state/` (Estado)
+
+Gestión de sesiones con SQLite:
+- **DB**: Abre conexión SQLite con WAL, migraciones automáticas.
+- **Reaper**: Hilo que cada 10 segundos revisa sesiones expiradas y las cierra.
+- **Client**: Estructura con MAC, IP, estado, tiempos, tráfico y límites.
+
+### `server/` (Servidor web)
+
+Sirve el portal cautivo:
+- `/portal` - Página de bienvenida con formulario de autenticación.
+- `/auth` - Procesa la autenticación y libera al cliente.
+- `/admin` - Panel de administración con autenticación básica.
+- `/` (catch-all) - Intercepta cualquier petición HTTP y redirige al portal.
+
+### `catsctl/` (CLI)
+
+Herramienta de administración desde terminal con comandos: `status`, `list`, `auth`, `kick`, `extend`, `limit`, `band`.
+
+## Flujo de autenticación
+
+1. Cliente se conecta al WiFi y recibe IP por DHCP.
+2. Cliente intenta navegar (ej. `http://ejemplo.com`).
+3. iptables redirige el puerto 80 al portal Catsplash (DNAT).
+4. Catsplash muestra el portal de bienvenida.
+5. Usuario acepta los términos → POST a `/auth`.
+6. Catsplash inserta reglas de firewall para liberar al cliente.
+7. Cliente tiene acceso a Internet hasta que expire su sesión.
+8. Al expirar, el Reaper bloquea al cliente y limpia las reglas.
+
+## Testing con network namespaces
+
+La suite de pruebas crea namespaces aislados:
+- `ns_router`: Ejecuta Catsplash.
+- `ns_wan`: Simula Internet público.
+- `ns_client [1..100]`: Clientes simulados con IP y MAC únicas.

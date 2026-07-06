@@ -1,0 +1,90 @@
+---
+title: Configuración TOML
+description: Referencia completa del archivo de configuración TOML.
+---
+
+Catsplash se configura mediante un archivo TOML. Por defecto busca `config.toml` en el directorio actual o `/opt/catsplash/config.toml`.
+
+## Ejemplo completo
+
+```toml
+iface = "wlx1cbfce41183a"
+wan_iface = "eth0"
+portal_port = 8080
+session_timeout = 3600
+idle_timeout = 900
+db_path = "/opt/catsplash/catsplash.db"
+redirect_url = "http://192.168.10.1:8080/portal"
+download_speed = "0"
+upload_speed = "0"
+admin_user = "admin"
+admin_pass = "catsplash"
+```
+
+## Campos
+
+### `iface`
+Interfaz de red para el hotspot WiFi.
+
+- **Tipo:** `string`
+- **Por defecto:** `"wlan0"`
+
+### `wan_iface`
+Interfaz de red con salida a Internet.
+
+- **Tipo:** `string`
+- **Por defecto:** `"eth0"`
+
+### `portal_port`
+Puerto donde escucha el servidor del portal web.
+
+- **Tipo:** `int`
+- **Por defecto:** `8080`
+
+### `session_timeout`
+Tiempo máximo absoluto de sesión en segundos.
+
+- **Tipo:** `int`
+- **Por defecto:** `3600` (1 hora)
+
+### `idle_timeout`
+Tiempo máximo de inactividad en segundos antes de cerrar la sesión.
+
+- **Tipo:** `int`
+- **Por defecto:** `600` (10 minutos)
+
+### `db_path`
+Ruta al archivo de base de datos SQLite.
+
+- **Tipo:** `string`
+- **Por defecto:** `"captive.db"`
+
+### `redirect_url`
+URL a la que se redirige a los clientes para el portal cautivo.
+
+- **Tipo:** `string`
+- **Por defecto:** `"http://192.168.1.1:8080/portal"`
+
+### `download_speed`
+Límite de descarga global. `"0"` para ilimitado.
+
+- **Tipo:** `string`
+- **Por defecto:** `"0"`
+
+### `upload_speed`
+Límite de subida global. `"0"` para ilimitado.
+
+- **Tipo:** `string`
+- **Por defecto:** `"0"`
+
+### `admin_user`
+Usuario para el panel de administración web.
+
+- **Tipo:** `string`
+- **Por defecto:** `"admin"`
+
+### `admin_pass`
+Contraseña para el panel de administración web.
+
+- **Tipo:** `string`
+- **Por defecto:** `"catsplash"`

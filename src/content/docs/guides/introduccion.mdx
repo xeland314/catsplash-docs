@@ -1,0 +1,33 @@
+---
+title: Introducción
+description: Qué es Catsplash, cómo funciona y por qué usarlo.
+---
+
+Catsplash es un **portal cautivo** escrito en Go diseñado para entornos Linux con recursos limitados. Su propósito es gestionar el acceso a Internet en redes WiFi temporales, bloqueando el tráfico de clientes no autenticados y liberándolo una vez que aceptan los términos del portal.
+
+## ¿Cómo funciona?
+
+1. Un cliente se conecta a la red WiFi del hotspot.
+2. Al intentar navegar, su petición HTTP es interceptada por iptables.
+3. Catsplash redirige al cliente al portal de bienvenida.
+4. El usuario acepta los términos y Catsplash libera su tráfico.
+5. Las sesiones expiran por tiempo absoluto o inactividad.
+
+## ¿Por qué Catsplash?
+
+- **Minimalista**: Un solo binario compilado en Go. Sin dependencias externas más allá de iptables y SQLite.
+- **Eficiente**: Consume menos de 25 MB de RAM bajo carga máxima.
+- **Determinista**: Las reglas de firewall se inyectan y limpian de forma atómica.
+- **Portátil**: Compilación cruzada para amd64, 386, arm64 y armv7.
+- **Probado**: Suite de simulación con network namespaces para validar concurrencia y estabilidad.
+
+## Limitaciones
+
+- Funciona **solamente en Linux** con iptables y acceso root.
+- La interceptación HTTPS no está implementada como solución de producción.
+- No incluye panel web de administración avanzada (solo CLI).
+
+## Enlaces
+
+- [Repositorio en GitHub](https://github.com/xeland314/catsplash)
+- [Release v0.1.0](https://github.com/xeland314/catsplash/releases/tag/v0.1.0)

@@ -1,0 +1,50 @@
+---
+title: Seguridad WiFi WPA2
+description: Como proteger tu red WiFi con cifrado WPA2-PSK en el portal cautivo.
+---
+
+Aunque el portal cautivo gestiona el acceso a Internet, es recomendable proteger el trafico inalambrico mediante cifrado WPA2.
+
+## Por que usar contrasena en el WiFi
+
+- **Cifrado del aire**: Sin contrasena, los datos pueden ser capturados por terceros.
+- **Control de Acceso**: Evita que usuarios no deseados se asocien a la red.
+- **Privacidad**: Asegura que la comunicacion sea privada entre el cliente y el AP.
+
+## Configuracion de hostapd con WPA2
+
+Anade las siguientes lineas a `/etc/hostapd/hostapd.conf`:
+
+```conf
+interface=wlx1cbfce41183a
+driver=nl80211
+ssid=Mi_Red_WiFi_Segura
+hw_mode=g
+channel=6
+
+# Seguridad WPA2
+wpa=2
+wpa_passphrase=TuContrasenaSegura123
+wpa_key_mgmt=WPA-PSK
+rsn_pairwise=CCMP
+
+# Estabilidad
+auth_algs=1
+wmm_enabled=0
+```
+
+## Aplicar los Cambios
+
+```bash
+sudo systemctl restart hostapd
+```
+
+## Interaccion con Catsplash
+
+La contrasena del WiFi **no interfiere** con el portal cautivo. El flujo es:
+
+1. El usuario selecciona la red WiFi e ingresa la contrasena.
+2. Una vez conectado, el sistema operativo detecta el portal y abre la ventana de Catsplash.
+3. El usuario debe "Conectar" en el portal para tener acceso a Internet.
+
+Este modelo de "Doble Seguridad" es el estandar para redes que desean control total sobre sus usuarios.

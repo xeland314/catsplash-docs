@@ -1,0 +1,90 @@
+---
+title: Uso
+description: Cómo iniciar Catsplash, gestionar sesiones y monitorear clientes.
+---
+
+## Iniciar Catsplash
+
+Una vez instalado, inicia el portal cautivo:
+
+```bash
+sudo ./bin/catsplash
+```
+
+O si está instalado como servicio systemd:
+
+```bash
+sudo systemctl start catsplash
+```
+
+Por defecto escucha en el puerto `8080`. Los clientes que se conecten al WiFi serán redirigidos automáticamente al portal.
+
+## catsctl: CLI de control
+
+`catsctl` es la herramienta de línea de comandos para gestionar Catsplash.
+
+### Ver estado del sistema
+
+```bash
+sudo catsctl status
+```
+
+Muestra las interfaces activas, puerto del portal, número de sesiones activas/pendientes y tráfico total.
+
+### Listar clientes
+
+```bash
+sudo catsctl list
+```
+
+Tabla con estado, MAC, IP, tiempo de conexión, datos usados, límites y ancho de banda de cada cliente.
+
+### Autorizar manualmente
+
+```bash
+sudo catsctl auth aa:bb:cc:dd:ee:ff 192.168.10.50
+```
+
+### Desconectar cliente
+
+```bash
+sudo catsctl kick aa:bb:cc:dd:ee:ff
+```
+
+### Extender sesión
+
+```bash
+sudo catsctl extend aa:bb:cc:dd:ee:ff 30
+```
+
+Extiende la sesión en 30 minutos.
+
+### Establecer límite de datos
+
+```bash
+sudo catsctl limit aa:bb:cc:dd:ee:ff 500
+```
+
+Límite de 500 MB. Usa `0` para eliminar el límite.
+
+### Establecer ancho de banda
+
+```bash
+sudo catsctl band aa:bb:cc:dd:ee:ff 5mbit 2mbit
+```
+
+Límite de descarga 5 Mbps y subida 2 Mbps. Usa `0` para eliminar el límite.
+
+## Panel de administración web
+
+Catsplash incluye un panel de administración básico en:
+
+```
+http://<gateway_ip>:8080/admin
+```
+
+Credenciales por defecto: `admin` / `catsplash`.
+
+## Monitoreo de tráfico
+
+Catsplash monitorea el tráfico de cada cliente autenticado cada 10 segundos usando contadores de iptables. Si un cliente excede su cuota de datos, la sesión se cierra automáticamente.

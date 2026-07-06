@@ -1,0 +1,50 @@
+---
+title: WiFi Security (WPA2)
+description: How to protect your WiFi network with WPA2-PSK encryption in the captive portal.
+---
+
+Although the captive portal manages Internet access, it is recommended to protect the wireless traffic with WPA2 encryption.
+
+## Why use a WiFi password
+
+- **Over-the-air encryption**: Without a password, data can be intercepted by third parties.
+- **Access Control**: Prevents unwanted users from associating with the network.
+- **Privacy**: Ensures communication is private between the client and the AP.
+
+## hostapd Configuration with WPA2
+
+Add the following lines to `/etc/hostapd/hostapd.conf`:
+
+```conf
+interface=wlx1cbfce41183a
+driver=nl80211
+ssid=My_Secure_WiFi
+hw_mode=g
+channel=6
+
+# WPA2 Security
+wpa=2
+wpa_passphrase=YourSecurePassword123
+wpa_key_mgmt=WPA-PSK
+rsn_pairwise=CCMP
+
+# Stability
+auth_algs=1
+wmm_enabled=0
+```
+
+## Apply Changes
+
+```bash
+sudo systemctl restart hostapd
+```
+
+## Interaction with Catsplash
+
+The WiFi password **does not interfere** with the captive portal. The flow is:
+
+1. User selects the WiFi network and enters the password.
+2. Once connected, the OS detects the portal and opens the Catsplash window.
+3. User must click "Connect" on the portal to get Internet access.
+
+This "Double Security" model is the standard for networks that want full control over their users.

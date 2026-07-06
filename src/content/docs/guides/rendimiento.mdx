@@ -1,0 +1,72 @@
+---
+title: Rendimiento
+description: Pruebas de estrés, consumo de recursos y estabilidad bajo carga.
+---
+
+Catsplash está diseñado para operar con recursos mínimos en hardware legacy o routers empotrados.
+
+## Hardware de prueba
+
+| Componente | Detalle |
+|---|---|
+| CPU | Intel Core 2 Duo E7400 @ 2.79 GHz (2 núcleos) |
+| RAM | 3.58 GiB |
+| Disco | ext4, 100 GiB |
+| OS | Debian GNU/Linux 13 (trixie), kernel 6.12 |
+
+## Prueba de concurrencia: 100 clientes simultáneos
+
+### Consumo de recursos
+
+| Estado | % CPU | RAM Real (RSS) | RAM Virtual (VIRT) |
+|---|---|---|---|
+| Reposo inicial | 0.0% | ~8.7 MB | ~1.7 GB |
+| Pico de carga | 13.6% | ~24.8 MB | ~3.1 GB |
+| Post-purga | 0.0% | ~14.7 MB | ~2.4 GB |
+
+### Tiempos de respuesta
+
+| Métrica | Ráfaga #1 | Ráfaga #2 |
+|---|---|---|
+| Peticiones exitosas | 100/100 | 100/100 |
+| Tiempo mínimo | 0.19 s | 0.42 s |
+| p50 | 1.34 s | 4.70 s |
+| p95 | 1.94 s | 5.32 s |
+| p99/máximo | 2.34 s | 5.72 s |
+
+## Prueba de estabilidad (Soak Test) - 60 minutos
+
+| Métrica | Reposo | Pico (100 clientes) | Post-purga |
+|---|---|---|---|
+| Memoria RSS | 8.7 MB | 24.8 MB | 14.7 MB |
+| Reglas NAT | 9 | 108 | 9 |
+| Reglas Filter | 10 | 208 | 10 |
+| Tamaño BD | 12 KB | 12 KB | 12 KB |
+| Errores HTTP | 0% | 0% | 0% |
+
+## Resultados clave
+
+- **Sin fugas de memoria**: La memoria RSS se estabiliza en ~14.7 MB tras la purga.
+- **0% reglas huérfanas**: Todas las reglas de iptables se limpian al expirar sesiones.
+- **Base de datos estable**: SQLite en modo WAL mantiene 12 KB sin crecimiento.
+- **100% de éxito HTTP**: Todas las peticiones concurrentes responden con HTTP 200.
+- **Fórmula determinista**: `Reglas NAT = 8 + clientes activos`, `Reglas Filter = 8 + (2 × clientes activos)`.
+
+## Cómo ejecutar tus propias pruebas
+
+```bash
+# 1. Crear topología con 50 clientes simulados
+sudo ./tests/test_catsplash_multiclient.sh up -n 50
+
+# 2. En otra terminal, iniciar Catsplash
+sudo ip netns exec ns_router ./bin/catsplash
+
+# 3. Ejecutar autenticaciones
+sudo ./tests/test_catsplash_multiclient.sh run
+
+# 4. Limpiar
+sudo ./tests/test_catsplash_multiclient.sh down
+
+# O prueba de larga duración (soak test)
+sudo ./tests/soak_test.sh -n 10 --hours 1
+```
