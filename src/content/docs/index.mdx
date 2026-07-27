@@ -19,6 +19,7 @@ Catsplash es un **portal cautivo** minimalista y eficiente para Linux. Permite a
 ## Características principales
 
 -   **Portal cautivo compatible** con Captive Network Assistant de Android e iOS.
+-   **Panel de administración** con autenticación, CSRF, y gestión de clientes activos.
 -   **Gestión de sesiones** con SQLite en modo WAL, expiración por tiempo absoluto e inactividad.
 -   **Firewall determinista** con iptables: 1 regla NAT + 2 reglas Filter por cliente activo.
 -   **CLI de control** `catsctl` para monitorear y administrar sesiones desde la terminal.
@@ -26,6 +27,9 @@ Catsplash es un **portal cautivo** minimalista y eficiente para Linux. Permite a
 -   **Bajo consumo de recursos**: menos de 25 MB de RAM bajo carga máxima de 100 clientes concurrentes.
 -   **Compilación cruzada** para Linux en múltiples arquitecturas (amd64, 386, arm64, armv7).
 -   **Suite de pruebas aisladas** usando network namespaces para simular hasta 100+ clientes WiFi.
+-   **Seguridad integrada**: bcrypt, CSRF, rate limiting, cookies HttpOnly/Secure/SameSite, sanitización de inputs.
+-   **Cumplimiento LOPDP**: Consentimiento explícito, derechos ARCO+ (acceso, portabilidad, eliminación), anonimización de MACs en logs, registro de auditoría.
+-   **CI/CD seguro**: gosec (security scan), golangci-lint, tests automatizados.
 
 ## Primeros pasos
 

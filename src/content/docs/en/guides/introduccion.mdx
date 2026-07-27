@@ -19,13 +19,15 @@ Catsplash is a **captive portal** written in Go, designed for resource-constrain
 - **Efficient**: Under 25 MB RAM at peak load.
 - **Deterministic**: Firewall rules are injected and cleaned atomically.
 - **Portable**: Cross-compiled for amd64, 386, arm64 and armv7.
+- **Secure**: bcrypt admin passwords, CSRF protection, rate limiting, input sanitization, and HttpOnly/Secure/SameSite cookies.
+- **LOPDP compliant**: Explicit consent, ARCO+ rights, MAC anonymization in logs, audit logging.
 - **Tested**: Network namespace simulation suite for concurrency and stability validation.
 
 ## Limitations
 
 - Works **on Linux only** with iptables and root access.
 - HTTPS interception is not implemented as a production solution.
-- No advanced web admin panel (CLI only).
+- SQLite is not encrypted at rest (SQLCipher pending).
 
 ## Links
 

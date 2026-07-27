@@ -59,30 +59,19 @@ SQLite session management:
 
 ### `server/` (Web server)
 
-Serves the captive portal:
-- `/portal` - Welcome page with authentication form.
+Serves the captive portal and administration:
+- `/portal` - Welcome page with authentication form and CSRF token.
 - `/auth` - Processes authentication and releases the client.
-- `/admin` - Admin panel with basic auth.
+- `/admin` - Admin panel with authentication, client management and session view.
+- `/privacy` - Privacy policy accessible from the portal.
+- `/data-request` - ARCO+ endpoint: personal data access request.
+- `/data-deletion` - ARCO+ endpoint: personal data deletion request.
 - `/` (catch-all) - Intercepts any HTTP request and redirects to the portal.
 
-### `catsctl/` (CLI)
+### `state/` (State)
 
-Terminal administration tool with commands: `status`, `list`, `auth`, `kick`, `extend`, `limit`, `band`.
-
-## Authentication flow
-
-1. Client connects to WiFi and gets an IP via DHCP.
-2. Client tries to browse (e.g. `http://example.com`).
-3. iptables redirects port 80 to the Catsplash portal (DNAT).
-4. Catsplash shows the welcome portal.
-5. User accepts terms → POST to `/auth`.
-6. Catsplash inserts firewall rules to release the client.
-7. Client has Internet access until their session expires.
-8. On expiration, the Reaper blocks the client and cleans up rules.
-
-## Testing with network namespaces
-
-The test suite creates isolated namespaces:
-- `ns_router`: Runs Catsplash.
-- `ns_wan`: Simulates public Internet.
-- `ns_client [1..100]`: Simulated clients with unique IP and MAC addresses.
+SQLite session management:
+- **DB**: Opens SQLite connection with WAL, automatic migrations.
+- **Reaper**: Goroutine that checks every 10 seconds for expired sessions and closes them.
+- **Client**: Struct with MAC, IP, state, timestamps, traffic, and limits.
+- **Audit**: Audit event logging (data access, deletions, authentication).

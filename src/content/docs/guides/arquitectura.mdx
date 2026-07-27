@@ -59,30 +59,19 @@ Gestión de sesiones con SQLite:
 
 ### `server/` (Servidor web)
 
-Sirve el portal cautivo:
-- `/portal` - Página de bienvenida con formulario de autenticación.
+Sirve el portal cautivo y la administración:
+- `/portal` - Página de bienvenida con formulario de autenticación y token CSRF.
 - `/auth` - Procesa la autenticación y libera al cliente.
-- `/admin` - Panel de administración con autenticación básica.
+- `/admin` - Panel de administración con autenticación, gestión de clientes y vista de sesiones.
+- `/privacy` - Política de privacidad accesible desde el portal.
+- `/data-request` - Endpoint ARCO+: solicitud de acceso a datos personales.
+- `/data-deletion` - Endpoint ARCO+: solicitud de eliminación de datos personales.
 - `/` (catch-all) - Intercepta cualquier petición HTTP y redirige al portal.
 
-### `catsctl/` (CLI)
+### `state/` (Estado)
 
-Herramienta de administración desde terminal con comandos: `status`, `list`, `auth`, `kick`, `extend`, `limit`, `band`.
-
-## Flujo de autenticación
-
-1. Cliente se conecta al WiFi y recibe IP por DHCP.
-2. Cliente intenta navegar (ej. `http://ejemplo.com`).
-3. iptables redirige el puerto 80 al portal Catsplash (DNAT).
-4. Catsplash muestra el portal de bienvenida.
-5. Usuario acepta los términos → POST a `/auth`.
-6. Catsplash inserta reglas de firewall para liberar al cliente.
-7. Cliente tiene acceso a Internet hasta que expire su sesión.
-8. Al expirar, el Reaper bloquea al cliente y limpia las reglas.
-
-## Testing con network namespaces
-
-La suite de pruebas crea namespaces aislados:
-- `ns_router`: Ejecuta Catsplash.
-- `ns_wan`: Simula Internet público.
-- `ns_client [1..100]`: Clientes simulados con IP y MAC únicas.
+Gestión de sesiones con SQLite:
+- **DB**: Abre conexión SQLite con WAL, migraciones automáticas.
+- **Reaper**: Hilo que cada 10 segundos revisa sesiones expiradas y las cierra.
+- **Client**: Estructura con MAC, IP, estado, tiempos, tráfico y límites.
+- **Audit**: Registro de eventos de auditoría (accesos a datos, eliminaciones, autenticación).

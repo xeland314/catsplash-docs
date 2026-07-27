@@ -21,6 +21,7 @@ export const GET: APIRoute = async () => {
 ## Performance
 - [Performance](/guides/rendimiento/) - Stress test results, benchmarks
 - [Network Troubleshooting](/guides/problemas-red/) - Common issues and fixes
+- [Security & LOPDP](/guides/seguridad/) - Security controls and data protection compliance
 
 ## Reference
 - [TOML Configuration](/reference/configuracion/) - All config fields
@@ -36,6 +37,7 @@ export const GET: APIRoute = async () => {
 - [Advanced Network Setup](/en/guides/red/)
 - [WiFi Security](/en/guides/seguridad-wifi/)
 - [Troubleshooting](/en/guides/problemas-red/)
+- [Security & LOPDP](/en/guides/seguridad/)
 - [catsctl CLI](/en/reference/catsctl/)
 - [TOML Configuration](/en/reference/configuracion/)
 `;

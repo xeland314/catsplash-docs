@@ -1,0 +1,67 @@
+---
+title: Seguridad y LOPDP
+description: Controles de seguridad implementados y cumplimiento con la Ley Orgánica de Protección de Datos Personales.
+---
+
+Catsplash implementa múltiples capas de seguridad y cumple con la LOPDP del Ecuador.
+
+## Controles de autenticación
+
+| Control | Implementación |
+|---------|---------------|
+| Contraseña admin hasheada | bcrypt con auto-detección de pre-hash |
+| Rate limiting en `/auth` | Sliding window: 5 intentos / 60s por IP |
+| CSRF en portal | Nonce aleatorio en cookie + campo hidden |
+| CSRF admin | Nonce en cookie + `subtle.ConstantTimeCompare` |
+| Consentimiento explícito | Checkbox `required` + validación backend |
+
+## Protección de datos
+
+| Control | Implementación |
+|---------|---------------|
+| Anonimización de logs | SHA-256 truncado para MACs en `maskMAC()` |
+| Nonces no registrados | Logs nunca contienen valores CSRF |
+| Identidad por cookie | ARCO+ endpoints resuelven MAC desde cookie |
+| SameSite=Strict | Cookies de admin con SameSite estricto |
+| HttpOnly + Secure | Todas las cookies con flags de seguridad |
+
+## Sanitización de inputs
+
+| Control | Implementación |
+|---------|---------------|
+| Validación MAC | Regex estricta `^[0-9A-Fa-f]{2}(:|-)?...` |
+| Args separados en exec | `exec.Command("iptables", ...)` sin shell |
+| Sin interpolación de strings | Nunca se construyen comandos con `fmt.Sprintf` |
+
+## Infraestructura segura
+
+| Control | Implementación |
+|---------|---------------|
+| SQLite WAL mode | Resiste crashes sin corromperse |
+| Firewall limpieza | `signal.Notify` limpia iptables al cerrar |
+| HTTP timeouts | `http.Server` con ReadTimeout, WriteTimeout, IdleTimeout |
+| gosec CI/CD | Security scan estático en cada build |
+
+## Cumplimiento LOPDP
+
+### Consentimiento (Art. 14)
+- El portal solicita consentimiento explícito antes de conectarse.
+- El consentimiento se registra con timestamp en la base de datos.
+- El usuario puede acceder a la política de privacidad antes de consentir.
+
+### Derechos ARCO+ (Arts. 26-30)
+- **Acceso**: `/data-request` permite solicitar datos personales.
+- **Portabilidad**: Los datos se exportan en formato JSON.
+- **Cancelación**: `/data-deletion` permite solicitar eliminación.
+- **Oposición**: El usuario puede desconectarse en cualquier momento.
+
+### Retención de datos (Art. 13)
+- Los datos de sesión se eliminan automáticamente al expirar.
+- No hay retención indefinida de datos personales.
+- Los logs no contienen datos personales identificables.
+
+### Auditoría
+- Registro de accesos a datos personales (`audit_log`).
+- Registro de eliminaciones de datos.
+- Registro de intentos de autenticación (éxito y fallo).
+- MACs enmascaradas en registros de auditoría.

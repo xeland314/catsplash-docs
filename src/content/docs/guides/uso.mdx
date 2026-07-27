@@ -77,13 +77,29 @@ Límite de descarga 5 Mbps y subida 2 Mbps. Usa `0` para eliminar el límite.
 
 ## Panel de administración web
 
-Catsplash incluye un panel de administración básico en:
+Catsplash incluye un panel de administración en:
 
 ```
 http://<gateway_ip>:8080/admin
 ```
 
 Credenciales por defecto: `admin` / `catsplash`.
+
+**Características del panel:**
+- Autenticación con contraseña hasheada (bcrypt).
+- Protección CSRF en todos los formularios.
+- Vista de clientes activos con estado, MAC enmascarada, IP y tiempos.
+- Control de cuota de datos y ancho de banda por cliente.
+- Logs de auditoría de accesos y eliminaciones de datos.
+
+## Derechos ARCO+ (LOPDP)
+
+Catsplash cumple con la Ley Orgánica de Protección de Datos Personales del Ecuador:
+
+- **Política de privacidad**: Disponible en `/privacy` desde el portal.
+- **Solicitud de datos**: Los usuarios pueden solicitar sus datos en `/data-request`.
+- **Eliminación de datos**: Los usuarios pueden solicitar la eliminación de sus datos en `/data-deletion`.
+- **Identidad por cookie**: La identidad del solicitante se resuelve desde cookie de sesión, nunca desde parámetros URL.
 
 ## Monitoreo de tráfico
 

@@ -37,6 +37,7 @@ export default defineConfig({
 						{ label: 'Red Avanzada', slug: 'guides/red', translations: { en: 'Advanced Network' } },
 						{ label: 'Seguridad WiFi', slug: 'guides/seguridad-wifi', translations: { en: 'WiFi Security' } },
 						{ label: 'Problemas de Red', slug: 'guides/problemas-red', translations: { en: 'Troubleshooting' } },
+						{ label: 'Seguridad y LOPDP', slug: 'guides/seguridad', translations: { en: 'Security & LOPDP' } },
 					],
 				},
 				{

@@ -1,0 +1,67 @@
+---
+title: Security & LOPDP
+description: Security controls implemented and compliance with Ecuador's Personal Data Protection Law.
+---
+
+Catsplash implements multiple security layers and complies with Ecuador's LOPDP.
+
+## Authentication controls
+
+| Control | Implementation |
+|---------|---------------|
+| Hashed admin password | bcrypt with pre-hash auto-detection |
+| Rate limiting on `/auth` | Sliding window: 5 attempts / 60s per IP |
+| Portal CSRF | Random nonce in cookie + hidden field |
+| Admin CSRF | Nonce in cookie + `subtle.ConstantTimeCompare` |
+| Explicit consent | `required` checkbox + backend validation |
+
+## Data protection
+
+| Control | Implementation |
+|---------|---------------|
+| Log anonymization | SHA-256 truncated for MACs in `maskMAC()` |
+| Nonces not logged | Logs never contain CSRF values |
+| Cookie-based identity | ARCO+ endpoints resolve MAC from cookie |
+| SameSite=Strict | Admin cookies with strict SameSite |
+| HttpOnly + Secure | All cookies with security flags |
+
+## Input sanitization
+
+| Control | Implementation |
+|---------|---------------|
+| MAC validation | Strict regex `^[0-9A-Fa-f]{2}(:|-)?...` |
+| Separated exec args | `exec.Command("iptables", ...)` without shell |
+| No string interpolation | Never build commands with `fmt.Sprintf` |
+
+## Secure infrastructure
+
+| Control | Implementation |
+|---------|---------------|
+| SQLite WAL mode | Crash-resistant without corruption |
+| Firewall cleanup | `signal.Notify` cleans iptables on exit |
+| HTTP timeouts | `http.Server` with ReadTimeout, WriteTimeout, IdleTimeout |
+| gosec CI/CD | Static security scanning on every build |
+
+## LOPDP Compliance
+
+### Consent (Art. 14)
+- The portal requests explicit consent before connecting.
+- Consent is recorded with timestamp in the database.
+- Users can access the privacy policy before consenting.
+
+### ARCO+ Rights (Arts. 26-30)
+- **Access**: `/data-request` allows requesting personal data.
+- **Portability**: Data is exported in JSON format.
+- **Cancellation**: `/data-deletion` allows requesting deletion.
+- **Opposition**: Users can disconnect at any time.
+
+### Data retention (Art. 13)
+- Session data is automatically deleted on expiration.
+- No indefinite retention of personal data.
+- Logs do not contain identifiable personal data.
+
+### Audit logging
+- Personal data access logging (`audit_log`).
+- Data deletion logging.
+- Authentication attempt logging (success and failure).
+- Masked MACs in audit records.
